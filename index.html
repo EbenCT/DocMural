@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediConnect - Directorio Médico</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="images/logo.png" alt="MediConnect" class="logo">
+                <h1>MediConnect</h1>
+            </div>
+            <p class="subtitle">Encuentra al profesional de salud que necesitas</p>
+        </header>
+
+        <!-- Search and New Registration -->
+        <div class="action-bar">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nombre o especialidad...">
+            </div>
+            <button id="newRegistrationBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Registro
+            </button>
+        </div>
+
+        <!-- Doctors Grid -->
+        <div id="doctorsGrid" class="doctors-grid">
+            <!-- Las tarjetas se generarán dinámicamente -->
+        </div>
+
+        <!-- No results message -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <i class="fas fa-search"></i>
+            <p>No se encontraron doctores con ese criterio de búsqueda</p>
+        </div>
+    </div>
+
+    <!-- Modal for New Registration -->
+    <div id="registrationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nuevo Registro de Doctor</h2>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <form id="doctorForm">
+                <div class="form-section">
+                    <h3>Datos Obligatorios</h3>
+                    <div class="form-group">
+                        <label for="doctorName">Nombre Completo *</label>
+                        <input type="text" id="doctorName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="specialty">Especialidad *</label>
+                        <input type="text" id="specialty" name="specialty" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Número de Teléfono *</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="Ej: +591 12345678">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Datos Opcionales</h3>
+                    <div class="form-group">
+                        <label for="clinic">Nombre de la Clínica</label>
+                        <input type="text" id="clinic" name="clinic">
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule">Horario de Atención</label>
+                        <input type="text" id="schedule" name="schedule" placeholder="Ej: Lun-Vie 8:00-18:00">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Dirección</label>
+                        <input type="text" id="address" name="address">
+                    </div>
+                    <div class="form-group">
+                        <label for="experience">Años de Experiencia</label>
+                        <input type="number" id="experience" name="experience" min="0">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-primary">Registrar Doctor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
