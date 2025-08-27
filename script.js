@@ -2,49 +2,66 @@
 const staticDoctors = [
     {
         id: 1,
-        name: "Dr. María González",
-        specialty: "Cardiología",
-        phone: "+591 70123456",
-        clinic: "Clínica Santa María",
-        schedule: "Lun-Vie 8:00-17:00",
-        address: "Av. San Martín #123",
-        experience: 15
+        name: "Dr. Camila Rojas",
+        specialty: "Pediatría",
+        phone: "+591 76583920"
     },
     {
         id: 2,
-        name: "Dr. Carlos Mendoza",
-        specialty: "Pediatría",
-        phone: "+591 71234567",
-        clinic: "Hospital Infantil",
-        schedule: "Lun-Sáb 9:00-18:00",
-        experience: 12
+        name: "Dr. Esteban Vargas",
+        specialty: "Cardiología",
+        phone: "+591 74829163"
     },
     {
         id: 3,
-        name: "Dra. Ana Rodríguez",
-        specialty: "Dermatología",
-        phone: "+591 72345678",
-        schedule: "Mar-Vie 14:00-19:00",
-        address: "Calle Bolívar #456"
+        name: "Dra. Mariana Gutiérrez",
+        specialty: "Neurología",
+        phone: "+591 71245698"
     },
     {
         id: 4,
-        name: "Dr. Luis Torres",
-        specialty: "Traumatología",
-        phone: "+591 73456789",
-        clinic: "Centro Médico Los Andes",
-        experience: 20
+        name: "Dr. Álvaro Mendoza",
+        specialty: "Medicina Interna",
+        phone: "+591 73482015"
     },
     {
         id: 5,
-        name: "Dra. Carmen Silva",
+        name: "Dra. Lucía Fernández",
         specialty: "Ginecología",
-        phone: "+591 74567890",
-        schedule: "Lun-Vie 10:00-16:00",
-        address: "Av. América #789",
-        experience: 8
+        phone: "+591 75913482"
+    },
+    {
+        id: 6,
+        name: "Dr. Rodrigo Salinas",
+        specialty: "Traumatología",
+        phone: "+591 72649830"
+    },
+    {
+        id: 7,
+        name: "Dra. Valeria Pinto",
+        specialty: "Dermatología",
+        phone: "+591 74321567"
+    },
+    {
+        id: 8,
+        name: "Dr. Jorge Aguilar",
+        specialty: "Psiquiatría",
+        phone: "+591 75890234"
+    },
+    {
+        id: 9,
+        name: "Dra. Sofía Zambrano",
+        specialty: "Oncología",
+        phone: "+591 71038429"
+    },
+    {
+        id: 10,
+        name: "Dr. Nicolás Herrera",
+        specialty: "Otorrinolaringología",
+        phone: "+591 76984321"
     }
 ];
+
 
 // Variables globales
 let doctors = [];
