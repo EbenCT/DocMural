@@ -49,6 +49,9 @@ const staticDoctors = [
 // Variables globales
 let doctors = [];
 let filteredDoctors = [];
+let isEditorMode = false;
+let currentEditingId = null;
+const EDITOR_PIN = "1234";
 
 // Elementos del DOM
 const doctorsGrid = document.getElementById('doctorsGrid');
@@ -59,6 +62,25 @@ const closeModal = document.getElementById('closeModal');
 const doctorForm = document.getElementById('doctorForm');
 const cancelBtn = document.getElementById('cancelBtn');
 const noResults = document.getElementById('noResults');
+
+// Editor mode elements
+const editorModeBtn = document.getElementById('editorModeBtn');
+const editorModeIndicator = document.getElementById('editorModeIndicator');
+const exitEditorMode = document.getElementById('exitEditorMode');
+const pinModal = document.getElementById('pinModal');
+const closePinModal = document.getElementById('closePinModal');
+const pinInput = document.getElementById('pinInput');
+const validatePin = document.getElementById('validatePin');
+const pinError = document.getElementById('pinError');
+
+// Edit modal elements
+const editModal = document.getElementById('editModal');
+const closeEditModal = document.getElementById('closeEditModal');
+const editDoctorForm = document.getElementById('editDoctorForm');
+const cancelEdit = document.getElementById('cancelEdit');
+const deleteDoctor = document.getElementById('deleteDoctor');
+const addCustomField = document.getElementById('addCustomField');
+const customFieldsContainer = document.getElementById('customFieldsContainer');
 
 // Inicializar la aplicación
 document.addEventListener('DOMContentLoaded', function() {
@@ -95,15 +117,39 @@ function setupEventListeners() {
     closeModal.addEventListener('click', closeModalHandler);
     cancelBtn.addEventListener('click', closeModalHandler);
     
-    // Cerrar modal al hacer clic fuera
+    // Editor mode
+    editorModeBtn.addEventListener('click', openPinModal);
+    exitEditorMode.addEventListener('click', exitEditorModeHandler);
+    closePinModal.addEventListener('click', closePinModalHandler);
+    validatePin.addEventListener('click', validatePinHandler);
+    pinInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            validatePinHandler();
+        }
+    });
+    
+    // Edit modal
+    closeEditModal.addEventListener('click', closeEditModalHandler);
+    cancelEdit.addEventListener('click', closeEditModalHandler);
+    deleteDoctor.addEventListener('click', deleteDoctorHandler);
+    addCustomField.addEventListener('click', addCustomFieldHandler);
+    
+    // Cerrar modales al hacer clic fuera
     window.addEventListener('click', function(event) {
         if (event.target === registrationModal) {
             closeModalHandler();
         }
+        if (event.target === pinModal) {
+            closePinModalHandler();
+        }
+        if (event.target === editModal) {
+            closeEditModalHandler();
+        }
     });
     
-    // Formulario
+    // Formularios
     doctorForm.addEventListener('submit', handleFormSubmit);
+    editDoctorForm.addEventListener('submit', handleEditFormSubmit);
 }
 
 // Manejar búsqueda
@@ -135,6 +181,228 @@ function closeModalHandler() {
     doctorForm.reset();
 }
 
+// ===== EDITOR MODE FUNCTIONS =====
+
+// Abrir modal de PIN
+function openPinModal() {
+    pinModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    pinInput.focus();
+    pinError.style.display = 'none';
+}
+
+// Cerrar modal de PIN
+function closePinModalHandler() {
+    pinModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    pinInput.value = '';
+    pinError.style.display = 'none';
+}
+
+// Validar PIN
+function validatePinHandler() {
+    const enteredPin = pinInput.value.trim();
+    
+    if (enteredPin === EDITOR_PIN) {
+        enableEditorMode();
+        closePinModalHandler();
+        showSuccessMessage('Modo editor activado');
+    } else {
+        pinError.style.display = 'block';
+        pinInput.value = '';
+        pinInput.focus();
+        
+        // Ocultar error después de 3 segundos
+        setTimeout(() => {
+            pinError.style.display = 'none';
+        }, 3000);
+    }
+}
+
+// Habilitar modo editor
+function enableEditorMode() {
+    isEditorMode = true;
+    editorModeIndicator.style.display = 'block';
+    editorModeBtn.style.display = 'none';
+    renderDoctors(); // Re-renderizar con botones de edición
+}
+
+// Salir del modo editor
+function exitEditorModeHandler() {
+    isEditorMode = false;
+    editorModeIndicator.style.display = 'none';
+    editorModeBtn.style.display = 'flex';
+    renderDoctors(); // Re-renderizar sin botones de edición
+    showSuccessMessage('Modo editor desactivado');
+}
+
+// Abrir modal de edición
+function openEditModal(doctorId) {
+    if (!isEditorMode) return;
+    
+    const doctor = doctors.find(d => d.id === parseInt(doctorId));
+    if (!doctor) return;
+    
+    currentEditingId = doctorId;
+    populateEditForm(doctor);
+    editModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+// Poblar formulario de edición
+function populateEditForm(doctor) {
+    document.getElementById('editDoctorId').value = doctor.id;
+    document.getElementById('editDoctorName').value = doctor.name || '';
+    document.getElementById('editSpecialty').value = doctor.specialty || '';
+    document.getElementById('editPhone').value = doctor.phone || '';
+    document.getElementById('editClinic').value = doctor.clinic || '';
+    document.getElementById('editSchedule').value = doctor.schedule || '';
+    document.getElementById('editAddress').value = doctor.address || '';
+    document.getElementById('editExperience').value = doctor.experience || '';
+    
+    // Poblar campos personalizados
+    populateCustomFields(doctor);
+}
+
+// Poblar campos personalizados
+function populateCustomFields(doctor) {
+    customFieldsContainer.innerHTML = '';
+    
+    const standardFields = ['id', 'name', 'specialty', 'phone', 'clinic', 'schedule', 'address', 'experience'];
+    
+    Object.keys(doctor).forEach(key => {
+        if (!standardFields.includes(key) && doctor[key] !== null && doctor[key] !== undefined) {
+            addCustomFieldToForm(key, doctor[key]);
+        }
+    });
+}
+
+// Agregar campo personalizado al formulario
+function addCustomFieldToForm(fieldName = '', fieldValue = '') {
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = 'custom-field-group';
+    
+    fieldDiv.innerHTML = `
+        <input type="text" class="field-label" placeholder="Nombre del campo" value="${fieldName}">
+        <input type="text" class="field-value" placeholder="Valor del campo" value="${fieldValue}">
+        <button type="button" class="remove-field" onclick="removeCustomField(this)">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+    
+    customFieldsContainer.appendChild(fieldDiv);
+}
+
+// Manejar agregar campo personalizado
+function addCustomFieldHandler() {
+    addCustomFieldToForm();
+}
+
+// Remover campo personalizado
+function removeCustomField(button) {
+    button.parentElement.remove();
+}
+
+// Cerrar modal de edición
+function closeEditModalHandler() {
+    editModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    editDoctorForm.reset();
+    customFieldsContainer.innerHTML = '';
+    currentEditingId = null;
+}
+
+// Manejar envío del formulario de edición
+function handleEditFormSubmit(event) {
+    event.preventDefault();
+    
+    if (!currentEditingId) return;
+    
+    const formData = new FormData(editDoctorForm);
+    const doctorIndex = doctors.findIndex(d => d.id === parseInt(currentEditingId));
+    
+    if (doctorIndex === -1) return;
+    
+    // Actualizar datos básicos
+    doctors[doctorIndex] = {
+        id: parseInt(currentEditingId),
+        name: formData.get('name').trim(),
+        specialty: formData.get('specialty').trim(),
+        phone: formData.get('phone').trim(),
+        clinic: formData.get('clinic') ? formData.get('clinic').trim() : null,
+        schedule: formData.get('schedule') ? formData.get('schedule').trim() : null,
+        address: formData.get('address') ? formData.get('address').trim() : null,
+        experience: formData.get('experience') ? parseInt(formData.get('experience')) : null
+    };
+    
+    // Agregar campos personalizados
+    const customFields = customFieldsContainer.querySelectorAll('.custom-field-group');
+    customFields.forEach(fieldGroup => {
+        const fieldName = fieldGroup.querySelector('.field-label').value.trim();
+        const fieldValue = fieldGroup.querySelector('.field-value').value.trim();
+        
+        if (fieldName && fieldValue) {
+            doctors[doctorIndex][fieldName] = fieldValue;
+        }
+    });
+    
+    // Limpiar campos nulos/vacíos
+    Object.keys(doctors[doctorIndex]).forEach(key => {
+        if (doctors[doctorIndex][key] === null || doctors[doctorIndex][key] === '' || doctors[doctorIndex][key] === undefined) {
+            delete doctors[doctorIndex][key];
+        }
+    });
+    
+    // Validar campos obligatorios
+    if (!doctors[doctorIndex].name || !doctors[doctorIndex].specialty || !doctors[doctorIndex].phone) {
+        alert('Por favor, complete todos los campos obligatorios.');
+        return;
+    }
+    
+    // Actualizar filteredDoctors
+    filteredDoctors = [...doctors];
+    
+    // Guardar en localStorage
+    saveDynamicDoctors();
+    
+    // Cerrar modal y actualizar vista
+    closeEditModalHandler();
+    renderDoctors();
+    
+    showSuccessMessage('Doctor actualizado exitosamente');
+}
+
+// Manejar eliminación de doctor
+function deleteDoctorHandler() {
+    if (!currentEditingId) return;
+    
+    const doctor = doctors.find(d => d.id === parseInt(currentEditingId));
+    if (!doctor) return;
+    
+    const confirmDelete = confirm(`¿Está seguro de que desea eliminar a ${doctor.name}?\n\nEsta acción no se puede deshacer.`);
+    
+    if (confirmDelete) {
+        // Remover doctor del array
+        doctors = doctors.filter(d => d.id !== parseInt(currentEditingId));
+        filteredDoctors = [...doctors];
+        
+        // Guardar en localStorage
+        saveDynamicDoctors();
+        
+        // Cerrar modal y actualizar vista
+        closeEditModalHandler();
+        renderDoctors();
+        
+        showSuccessMessage('Doctor eliminado exitosamente');
+    }
+}
+
+// Guardar doctores dinámicos en localStorage
+function saveDynamicDoctors() {
+    const dynamicDoctors = doctors.filter(doc => !staticDoctors.some(staticDoc => staticDoc.id === doc.id));
+    localStorage.setItem('doctors', JSON.stringify(dynamicDoctors));
+}
+
 // Manejar envío del formulario
 function handleFormSubmit(event) {
     event.preventDefault();
@@ -151,6 +419,13 @@ function handleFormSubmit(event) {
         experience: formData.get('experience') ? parseInt(formData.get('experience')) : null
     };
     
+    // Limpiar campos nulos/vacíos
+    Object.keys(newDoctor).forEach(key => {
+        if (newDoctor[key] === null || newDoctor[key] === '' || newDoctor[key] === undefined) {
+            delete newDoctor[key];
+        }
+    });
+    
     // Validar campos obligatorios
     if (!newDoctor.name || !newDoctor.specialty || !newDoctor.phone) {
         alert('Por favor, complete todos los campos obligatorios.');
@@ -161,22 +436,21 @@ function handleFormSubmit(event) {
     doctors.push(newDoctor);
     filteredDoctors = [...doctors];
     
-    // Guardar en localStorage (solo los doctores nuevos, no los estáticos)
-    const dynamicDoctors = doctors.filter(doc => !staticDoctors.some(staticDoc => staticDoc.id === doc.id));
-    localStorage.setItem('doctors', JSON.stringify(dynamicDoctors));
+    // Guardar en localStorage
+    saveDynamicDoctors();
     
     // Cerrar modal y actualizar vista
     closeModalHandler();
     renderDoctors();
     
     // Mostrar mensaje de éxito
-    showSuccessMessage();
+    showSuccessMessage('Doctor registrado exitosamente');
 }
 
 // Mostrar mensaje de éxito
-function showSuccessMessage() {
-    const message = document.createElement('div');
-    message.style.cssText = `
+function showSuccessMessage(message = 'Operación exitosa') {
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -187,13 +461,16 @@ function showSuccessMessage() {
         box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
         z-index: 1001;
         animation: slideIn 0.5s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     `;
-    message.innerHTML = '<i class="fas fa-check"></i> Doctor registrado exitosamente';
+    messageDiv.innerHTML = `<i class="fas fa-check"></i> ${message}`;
     
-    document.body.appendChild(message);
+    document.body.appendChild(messageDiv);
     
     setTimeout(() => {
-        message.remove();
+        messageDiv.remove();
     }, 3000);
 }
 
@@ -215,7 +492,7 @@ function renderDoctors() {
 function createDoctorCard(doctor) {
     const optionalFields = [];
     
-    // Agregar campos opcionales si existen
+    // Campos estándar opcionales
     if (doctor.clinic) {
         optionalFields.push(`
             <div class="detail-item">
@@ -252,8 +529,33 @@ function createDoctorCard(doctor) {
         `);
     }
     
+    // Campos personalizados
+    const standardFields = ['id', 'name', 'specialty', 'phone', 'clinic', 'schedule', 'address', 'experience'];
+    Object.keys(doctor).forEach(key => {
+        if (!standardFields.includes(key) && doctor[key] !== null && doctor[key] !== undefined && doctor[key] !== '') {
+            optionalFields.push(`
+                <div class="detail-item">
+                    <i class="fas fa-info-circle"></i>
+                    <span><strong>${key}:</strong> ${doctor[key]}</span>
+                </div>
+            `);
+        }
+    });
+    
+    // Botones de edición si está en modo editor
+    const editButtons = isEditorMode ? `
+        <div class="edit-buttons">
+            <button class="edit-btn" onclick="openEditModal(${doctor.id})">
+                <i class="fas fa-edit"></i>
+                Editar
+            </button>
+        </div>
+    ` : '';
+    
+    const cardClass = isEditorMode ? 'doctor-card editor-mode' : 'doctor-card';
+    
     return `
-        <div class="doctor-card">
+        <div class="${cardClass}">
             <div class="doctor-header">
                 <div class="doctor-info">
                     <h3>${doctor.name}</h3>
@@ -271,6 +573,8 @@ function createDoctorCard(doctor) {
                 </div>
                 ${optionalFields.join('')}
             </div>
+            
+            ${editButtons}
         </div>
     `;
 }
@@ -317,6 +621,15 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = value;
         });
     }
+    
+    // También para el formulario de edición
+    const editPhoneInput = document.getElementById('editPhone');
+    if (editPhoneInput) {
+        editPhoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d+\s-]/g, '');
+            e.target.value = value;
+        });
+    }
 });
 
 // Capitalizar nombre automáticamente
@@ -331,21 +644,93 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = capitalizedWords.join(' ');
         });
     }
+    
+    // También para el formulario de edición
+    const editNameInput = document.getElementById('editDoctorName');
+    if (editNameInput) {
+        editNameInput.addEventListener('input', function(e) {
+            const words = e.target.value.split(' ');
+            const capitalizedWords = words.map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            );
+            e.target.value = capitalizedWords.join(' ');
+        });
+    }
 });
+
+// ===== FUNCIONES DE ADMINISTRACIÓN =====
 
 // Función para limpiar localStorage (útil para desarrollo)
 function clearAllData() {
     localStorage.removeItem('doctors');
     loadDoctors();
     renderDoctors();
-    console.log('Datos limpiados');
+    showSuccessMessage('Datos limpiados');
 }
 
-// Función para exportar datos (útil para backup)
-function exportData() {
+// Función para cambiar PIN (útil para administración)
+function changeEditorPin(newPin) {
+    if (typeof newPin !== 'string' || newPin.length < 4) {
+        console.error('El PIN debe ser una cadena de al menos 4 caracteres');
+        return false;
+    }
+    
+    localStorage.setItem('editorPin', newPin);
+    showSuccessMessage('PIN de editor actualizado');
+    return true;
+}
+
+// Función para obtener estadísticas del modo editor
+function getEditorStats() {
+    const totalDoctors = doctors.length;
+    const staticCount = staticDoctors.length;
+    const dynamicCount = totalDoctors - staticCount;
+    const specialties = [...new Set(doctors.map(d => d.specialty))];
+    
+    // Campos personalizados únicos
+    const standardFields = ['id', 'name', 'specialty', 'phone', 'clinic', 'schedule', 'address', 'experience'];
+    const customFields = new Set();
+    
+    doctors.forEach(doctor => {
+        Object.keys(doctor).forEach(key => {
+            if (!standardFields.includes(key)) {
+                customFields.add(key);
+            }
+        });
+    });
+    
+    const stats = {
+        totalDoctors,
+        staticDoctors: staticCount,
+        dynamicDoctors: dynamicCount,
+        specialties: specialties.length,
+        specialtiesList: specialties,
+        customFields: customFields.size,
+        customFieldsList: [...customFields],
+        editorModeActive: isEditorMode
+    };
+    
+    console.log('=== ESTADÍSTICAS DEL EDITOR ===');
+    console.log(`Total de doctores: ${stats.totalDoctors}`);
+    console.log(`Doctores estáticos: ${stats.staticDoctors}`);
+    console.log(`Doctores dinámicos: ${stats.dynamicDoctors}`);
+    console.log(`Especialidades: ${stats.specialties}`);
+    console.log(`Campos personalizados: ${stats.customFields}`);
+    console.log(`Modo editor activo: ${stats.editorModeActive ? 'Sí' : 'No'}`);
+    
+    return stats;
+}
+
+// Función para exportar datos con campos personalizados
+function exportDataWithCustomFields() {
     const data = {
         doctors: doctors,
-        exportDate: new Date().toISOString()
+        totalDoctors: doctors.length,
+        staticDoctors: staticDoctors.length,
+        dynamicDoctors: doctors.length - staticDoctors.length,
+        customFields: getCustomFieldsUsed(),
+        exportDate: new Date().toISOString(),
+        version: '2.0'
     };
     
     const dataStr = JSON.stringify(data, null, 2);
@@ -353,22 +738,52 @@ function exportData() {
     
     const link = document.createElement('a');
     link.href = URL.createObjectURL(dataBlob);
-    link.download = `doctors_backup_${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `doctors_backup_with_custom_fields_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
+    
+    showSuccessMessage('Datos exportados exitosamente');
 }
 
-// Función para mostrar estadísticas (útil para admin)
-function showStats() {
-    const totalDoctors = doctors.length;
-    const specialties = [...new Set(doctors.map(d => d.specialty))];
-    const withClinics = doctors.filter(d => d.clinic).length;
+// Obtener campos personalizados utilizados
+function getCustomFieldsUsed() {
+    const standardFields = ['id', 'name', 'specialty', 'phone', 'clinic', 'schedule', 'address', 'experience'];
+    const customFields = {};
     
-    console.log(`
-        === ESTADÍSTICAS ===
-        Total de doctores: ${totalDoctors}
-        Especialidades: ${specialties.length} (${specialties.join(', ')})
-        Con clínica: ${withClinics}
-        Datos estáticos: ${staticDoctors.length}
-        Datos dinámicos: ${totalDoctors - staticDoctors.length}
-    `);
+    doctors.forEach(doctor => {
+        Object.keys(doctor).forEach(key => {
+            if (!standardFields.includes(key)) {
+                if (!customFields[key]) {
+                    customFields[key] = 0;
+                }
+                customFields[key]++;
+            }
+        });
+    });
+    
+    return customFields;
+}
+
+// Función para limpiar campos personalizados huérfanos
+function cleanCustomFields() {
+    let cleaned = 0;
+    
+    doctors.forEach(doctor => {
+        Object.keys(doctor).forEach(key => {
+            if (doctor[key] === null || doctor[key] === undefined || doctor[key] === '') {
+                delete doctor[key];
+                cleaned++;
+            }
+        });
+    });
+    
+    if (cleaned > 0) {
+        saveDynamicDoctors();
+        filteredDoctors = [...doctors];
+        renderDoctors();
+        showSuccessMessage(`${cleaned} campos vacíos eliminados`);
+    } else {
+        showSuccessMessage('No hay campos vacíos para limpiar');
+    }
+    
+    return cleaned;
 }
