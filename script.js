@@ -869,3 +869,81 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+// ===== COMENTARIOS =====
+document.addEventListener("DOMContentLoaded", function () {
+    const commentsList = document.getElementById("commentsList");
+    const newCommentForm = document.getElementById("newCommentForm");
+    const commentName = document.getElementById("commentName");
+    const commentText = document.getElementById("commentText");
+
+    // Comentarios estáticos iniciales
+    const staticComments = [
+        {
+            name: "María López",
+            text: "Me encanta la plataforma, encontré a mi médico de confianza en pocos minutos.",
+            date: "2025-08-10"
+        },
+        {
+            name: "Carlos Méndez",
+            text: "Muy útil y fácil de usar. Los filtros me ayudaron a ahorrar mucho tiempo.",
+            date: "2025-08-15"
+        }
+    ];
+
+    // Cargar comentarios desde localStorage
+    function loadComments() {
+        const saved = JSON.parse(localStorage.getItem("comments")) || [];
+        return [...staticComments, ...saved];
+    }
+
+    // Guardar comentario en localStorage
+    function saveComment(comment) {
+        const saved = JSON.parse(localStorage.getItem("comments")) || [];
+        saved.push(comment);
+        localStorage.setItem("comments", JSON.stringify(saved));
+    }
+
+    // Renderizar comentarios
+    function renderComments() {
+        const comments = loadComments();
+        commentsList.innerHTML = comments.map(c => createCommentCard(c)).join("");
+    }
+
+    // Crear tarjeta de comentario
+    function createCommentCard(comment) {
+        const initials = comment.name.charAt(0).toUpperCase();
+        return `
+            <div class="comment-card">
+                <div class="comment-header">
+                    <div class="comment-avatar">${initials}</div>
+                    <div class="comment-info">
+                        <h4>${comment.name}</h4>
+                        <span>${comment.date}</span>
+                    </div>
+                </div>
+                <p class="comment-text">${comment.text}</p>
+            </div>
+        `;
+    }
+
+    // Manejar envío de formulario
+    newCommentForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const newComment = {
+            name: commentName.value.trim(),
+            text: commentText.value.trim(),
+            date: new Date().toISOString().split("T")[0]
+        };
+
+        if (newComment.name && newComment.text) {
+            saveComment(newComment);
+            renderComments();
+            newCommentForm.reset();
+        }
+    });
+
+    // Inicializar
+    renderComments();
+});

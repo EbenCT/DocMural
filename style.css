@@ -929,3 +929,126 @@ form {
     background: linear-gradient(135deg, #5a6fd8, #6b3f9a);
     transform: translateY(-2px);
 }
+
+/* Comentarios */
+.comments-section {
+    margin: 80px 0;
+    padding: 60px 30px;
+    background: linear-gradient(135deg, #f8f9fc 0%, #eaf0f9 100%);
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin-bottom: 40px;
+}
+
+.comments-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.comment-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    text-align: left;
+    transition: transform 0.3s ease;
+    animation: fadeIn 0.6s ease forwards;
+    position: relative;
+}
+
+.comment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.comment-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.comment-info h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.comment-info span {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.comment-text {
+    color: #555;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    text-align: justify;
+}
+
+/* Formulario */
+.comment-form {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.comment-form h3 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.comment-form input,
+.comment-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ecf0f1;
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.comment-form input:focus,
+.comment-form textarea:focus {
+    border-color: #667eea;
+}
+
+.comment-form textarea {
+    min-height: 120px;
+    resize: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .comments-list {
+        grid-template-columns: 1fr;
+    }
+}
