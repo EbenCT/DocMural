@@ -845,4 +845,27 @@ document.addEventListener("DOMContentLoaded", function () {
             showSlide(i);
         });
     });
+
+    // Cambio automático cada 5 segundos
+    setInterval(nextSlide, 5000);
+});
+
+// ===== Expandir / Colapsar Misión y Visión =====
+document.addEventListener("DOMContentLoaded", function () {
+    const toggles = document.querySelectorAll(".mv-toggle");
+
+    toggles.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const targetId = this.getAttribute("data-target");
+            const content = document.getElementById(targetId);
+
+            if (content.classList.contains("show")) {
+                content.classList.remove("show");
+                this.textContent = "Ver más";
+            } else {
+                content.classList.add("show");
+                this.textContent = "Ver menos";
+            }
+        });
+    });
 });
