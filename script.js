@@ -178,7 +178,8 @@ function handleSearch() {
     } else {
         filteredDoctors = doctors.filter(doctor => 
             doctor.name.toLowerCase().includes(searchTerm) ||
-            doctor.specialty.toLowerCase().includes(searchTerm)
+            doctor.specialty.toLowerCase().includes(searchTerm)||
+            (doctor.address && doctor.address.toLowerCase().includes(searchTerm))
         );
     }
     
@@ -804,3 +805,44 @@ function cleanCustomFields() {
     
     return cleaned;
 }
+
+// ===== Carrusel con controles =====
+document.addEventListener("DOMContentLoaded", function () {
+    const slides = document.getElementById("slides");
+    const dots = document.querySelectorAll(".dot");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let index = 0;
+    const total = dots.length;
+
+    function showSlide(i) {
+        if (i >= total) index = 0;
+        else if (i < 0) index = total - 1;
+        else index = i;
+
+        slides.style.transform = `translateX(-${index * 100}%)`;
+
+        dots.forEach(dot => dot.classList.remove("active"));
+        dots[index].classList.add("active");
+    }
+
+    function nextSlide() {
+        showSlide(index + 1);
+    }
+
+    function prevSlide() {
+        showSlide(index - 1);
+    }
+
+    // Eventos
+    nextBtn.addEventListener("click", nextSlide);
+    prevBtn.addEventListener("click", prevSlide);
+
+    dots.forEach(dot => {
+        dot.addEventListener("click", (e) => {
+            const i = parseInt(e.target.getAttribute("data-index"));
+            showSlide(i);
+        });
+    });
+});

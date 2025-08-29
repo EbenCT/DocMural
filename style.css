@@ -697,3 +697,83 @@ form {
 .modal-content::-webkit-scrollbar-thumb:hover {
     background: #5a6fd8;
 }
+/* Welcome Section */
+.welcome-section {
+    margin-bottom: 40px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.carousel {
+    width: 100%;
+    height: 400px; /* <<--- Aumentamos la altura (antes 300px) */
+    position: relative;
+    overflow: hidden;
+}
+
+.slides {
+    display: flex;
+    width: 300%;
+    height: 100%;
+}
+
+.slides img {
+    width: 100%;
+    height: 400px; /* <<--- coincide con el contenedor */
+    object-fit: cover;
+}
+
+/* Flechas de navegación */
+.carousel .prev,
+.carousel .next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 24px;
+    transition: background 0.3s;
+    z-index: 10;
+}
+
+.carousel .prev:hover,
+.carousel .next:hover {
+    background: rgba(0,0,0,0.8);
+}
+
+.carousel .prev {
+    left: 20px;
+}
+
+.carousel .next {
+    right: 20px;
+}
+
+/* Indicadores (puntos) */
+.indicators {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.dot {
+    display: inline-block;
+    height: 12px;
+    width: 12px;
+    margin: 0 5px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.dot.active,
+.dot:hover {
+    background: rgba(255,255,255,1);
+}

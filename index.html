@@ -18,11 +18,34 @@
             <p class="subtitle">Encuentra al profesional de salud que necesitas</p>
         </header>
 
+<!-- Welcome Section -->
+<section class="welcome-section">
+    <div class="carousel">
+        <div class="slides" id="slides">
+            <img src="images/banner1.jpg" alt="Bienvenida 1">
+            <img src="images/banner2.jpg" alt="Bienvenida 2">
+            <img src="images/banner3.jpg" alt="Bienvenida 3">
+        </div>
+
+        <!-- Flechas -->
+        <button class="prev" id="prevBtn">&#10094;</button>
+        <button class="next" id="nextBtn">&#10095;</button>
+
+        <!-- Indicadores -->
+        <div class="indicators" id="indicators">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+        </div>
+    </div>
+</section>
+
+
         <!-- Search and New Registration -->
         <div class="action-bar">
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Buscar por nombre o especialidad...">
+                <input type="text" id="searchInput" placeholder="Buscar por nombre, especialidad o dirección...">
             </div>
             <div class="action-buttons">
                 <button id="editorModeBtn" class="btn-editor">
@@ -35,7 +58,7 @@
                 </button>
             </div>
         </div>
-
+        
         <!-- Editor Mode Indicator -->
         <div id="editorModeIndicator" class="editor-mode-indicator" style="display: none;">
             <div class="editor-indicator-content">
@@ -152,6 +175,8 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal for New Doctor -->
     <div id="registrationModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
