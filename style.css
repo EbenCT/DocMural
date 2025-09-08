@@ -707,7 +707,7 @@ form {
 
 .carousel {
     width: 100%;
-    height: 400px; /* <<--- Aumentamos la altura (antes 300px) */
+    height: 650px; /* <<--- Aumentamos la altura (antes 300px) */
     position: relative;
     overflow: hidden;
 }
@@ -720,7 +720,7 @@ form {
 
 .slides img {
     flex: 0 0 100%;
-    height: 400px; /* <<--- coincide con el contenedor */
+    height: 650px; /* <<--- coincide con el contenedor */
     object-fit: cover;
 }
 
